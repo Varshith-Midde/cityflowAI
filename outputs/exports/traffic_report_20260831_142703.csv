@@ -1,0 +1,15 @@
+CityFlow AI - Traffic Detection Session Report
+Export Timestamp,2026-08-31T14:27:03.408629
+Model,yolov8n.pt
+Confidence Threshold,0.40
+Total Unique Tracked Vehicles,0
+
+Vehicle Class Breakdown
+Bicycle,0
+Car,0
+Motorcycle,0
+Bus,0
+Truck,0
+
+Detection Event Logs
+Timestamp,Class,Confidence,Track ID
