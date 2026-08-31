@@ -383,7 +383,7 @@ class CityFlowApp(tk.Tk):
         self.rtsp_url_var = tk.StringVar(value="rtsp://192.168.1.100:554/stream")
         
         self.model_name_var = tk.StringVar(value="yolov8n.pt")
-        self.conf_var = tk.DoubleVar(value=0.40)
+        self.conf_var = tk.DoubleVar(value=0.25)
         self.iou_var = tk.DoubleVar(value=0.45)
         self.tracking_var = tk.BooleanVar(value=True)
         self.trails_var = tk.BooleanVar(value=True)
@@ -416,6 +416,9 @@ class CityFlowApp(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         self.after(20, self._process_frame_queue)
         self.after(50, self._process_event_queue)
+
+        # Automatically start laptop camera (Index 0) on startup
+        self.after(400, self._auto_start_camera)
 
         logger.info("CityFlow AI Tkinter UI initialized successfully.")
 
@@ -692,6 +695,21 @@ class CityFlowApp(tk.Tk):
             command=self._on_toggle_play
         )
         self.btn_play_pause.pack(side=tk.LEFT, padx=(0, 6))
+
+        self.btn_cam_quick = tk.Button(
+            control_bar,
+            text="📹 Laptop Camera",
+            font=(FONT_FAMILY, 10, "bold"),
+            bg="#238636",
+            fg="white",
+            activebackground="#2ea043",
+            relief="flat",
+            padx=14,
+            pady=6,
+            cursor="hand2",
+            command=self._on_start_camera
+        )
+        self.btn_cam_quick.pack(side=tk.LEFT, padx=4)
 
         self.btn_stop = tk.Button(
             control_bar,
@@ -1487,6 +1505,14 @@ class CityFlowApp(tk.Tk):
         self.status_pill.configure(text="● RUNNING", fg=ACCENT_GREEN)
         self._set_status(f"Streaming from: {source_path_or_idx}")
 
+    def _auto_start_camera(self):
+        """Attempts to auto-connect laptop camera (index 0) on startup."""
+        logger.info("Auto-starting laptop camera (Index 0)...")
+        try:
+            self._start_source("0")
+        except Exception as e:
+            logger.warning(f"Could not auto-start camera: {e}")
+
     def _on_toggle_play(self):
         """Toggles between Play / Pause / Start."""
         if self.worker is not None and self.worker.is_alive():
@@ -1500,8 +1526,8 @@ class CityFlowApp(tk.Tk):
                 self.status_pill.configure(text="● RUNNING", fg=ACCENT_GREEN)
                 self._set_status("Video stream resumed.")
         else:
-            # Start current selected source
-            self._on_load_sample_video()
+            # Start laptop camera by default
+            self._on_start_camera()
 
     def _on_stop(self):
         """Stops active stream worker."""

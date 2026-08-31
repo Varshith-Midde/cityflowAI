@@ -56,12 +56,12 @@ class HUDVisualizer:
         x1, y1, x2, y2 = det.bbox
         color = det.color
 
-        # Draw main bounding box
-        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
+        # Draw bold main bounding box
+        cv2.rectangle(frame, (x1, y1), (x2, y2), color, 3)
 
         # Draw stylish corner accents
-        corner_len = min(20, (x2 - x1) // 4, (y2 - y1) // 4)
-        thickness = 3
+        corner_len = min(25, max(10, (x2 - x1) // 4), max(10, (y2 - y1) // 4))
+        thickness = 4
         # Top-Left
         cv2.line(frame, (x1, y1), (x1 + corner_len, y1), color, thickness)
         cv2.line(frame, (x1, y1), (x1, y1 + corner_len), color, thickness)
@@ -75,12 +75,12 @@ class HUDVisualizer:
         cv2.line(frame, (x2, y2), (x2 - corner_len, y2), color, thickness)
         cv2.line(frame, (x2, y2), (x2, y2 - corner_len), color, thickness)
 
-        # Build label text
+        # Build label text (e.g., "[CAR] 85%" or "#1 CAR 85%")
         parts = []
         if self.config.show_ids and det.track_id is not None:
             parts.append(f"#{det.track_id}")
         if self.config.show_labels:
-            parts.append(det.class_name)
+            parts.append(det.class_name.upper())
         if self.config.show_conf:
             parts.append(f"{int(det.confidence * 100)}%")
 
@@ -89,25 +89,27 @@ class HUDVisualizer:
             return
 
         font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 0.55
-        font_thickness = 1
+        font_scale = 0.60
+        font_thickness = 2
         (label_w, label_h), baseline = cv2.getTextSize(label, font, font_scale, font_thickness)
 
-        # Label background coordinates
-        badge_y1 = max(0, y1 - label_h - 10)
-        badge_y2 = y1
+        # Label background coordinates (placed above box, or inside if near top border)
+        badge_y1 = max(0, y1 - label_h - 12)
+        badge_y2 = y1 if y1 >= label_h + 12 else y1 + label_h + 14
         badge_x1 = x1
-        badge_x2 = min(frame.shape[1], x1 + label_w + 12)
+        badge_x2 = min(frame.shape[1], x1 + label_w + 14)
 
         # Draw filled background badge
         cv2.rectangle(frame, (badge_x1, badge_y1), (badge_x2, badge_y2), color, cv2.FILLED)
+        cv2.rectangle(frame, (badge_x1, badge_y1), (badge_x2, badge_y2), (20, 20, 20), 1)
         
-        # High-contrast text (dark text on bright colors)
-        text_color = (20, 20, 20) if (color[0]*0.299 + color[1]*0.587 + color[2]*0.114) > 150 else (255, 255, 255)
+        # High-contrast text
+        text_color = (15, 15, 15) if (color[0]*0.299 + color[1]*0.587 + color[2]*0.114) > 140 else (255, 255, 255)
+        text_y = badge_y2 - 6 if y1 >= label_h + 12 else badge_y2 - 6
         cv2.putText(
             frame,
             label,
-            (badge_x1 + 6, badge_y2 - 6),
+            (badge_x1 + 7, text_y),
             font,
             font_scale,
             text_color,
