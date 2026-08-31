@@ -9,7 +9,7 @@ from typing import Dict, List, Tuple
 class VehicleDetectionConfig:
     # Model configuration
     model_name: str = "yolov8n.pt"  # Options: yolov8n.pt, yolov8s.pt, yolo11n.pt, etc.
-    confidence_threshold: float = 0.40
+    confidence_threshold: float = 0.25
     iou_threshold: float = 0.45
     device: str = ""  # '' = auto (CUDA if available else CPU), 'cpu', 'cuda:0'
     imgsz: int = 640
