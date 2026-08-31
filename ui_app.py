@@ -178,6 +178,9 @@ class VideoWorker(threading.Thread):
             detections, counts, fps = self.detector.process_frame(frame)
             latency = self.detector.last_latency_ms
 
+            # Compute Traffic Density
+            density_label, density_color = self.detector.get_traffic_density(len(detections))
+
             # Gather track trajectories
             track_histories = {}
             if self.config.enable_tracking:
@@ -193,7 +196,11 @@ class VideoWorker(threading.Thread):
                 fps=fps,
                 track_histories=track_histories,
                 is_paused=False,
-                device_info=self.device_info
+                device_info=self.device_info,
+                inbound_count=self.detector.inbound_count,
+                outbound_count=self.detector.outbound_count,
+                density_label=density_label,
+                density_color=density_color
             )
             last_frame_annotated = annotated_frame
 
@@ -216,7 +223,11 @@ class VideoWorker(threading.Thread):
                 latency=latency,
                 frame_idx=frame_idx,
                 total_frames=total_frames,
-                is_paused=False
+                is_paused=False,
+                density_label=density_label,
+                density_color=density_color,
+                inbound_count=self.detector.inbound_count,
+                outbound_count=self.detector.outbound_count
             )
 
             # Sleep slightly to match native FPS on video playback if not live
@@ -271,7 +282,8 @@ class VideoWorker(threading.Thread):
             time.sleep(0.05)
 
     def _push_frame(
-        self, annotated_frame, raw_frame, detections, counts, fps, latency, frame_idx, total_frames, is_paused
+        self, annotated_frame, raw_frame, detections, counts, fps, latency, frame_idx, total_frames, is_paused,
+        density_label: str = "SMOOTH", density_color: Tuple[int, int, int] = (56, 239, 125), inbound_count: int = 0, outbound_count: int = 0
     ):
         """Pushes data into the frame queue, dropping older frames if queue is full."""
         data = {
@@ -284,7 +296,11 @@ class VideoWorker(threading.Thread):
             "frame_idx": frame_idx,
             "total_frames": total_frames,
             "is_paused": is_paused,
-            "unique_tracks": self.detector.get_total_unique_vehicles()
+            "unique_tracks": self.detector.get_total_unique_vehicles(),
+            "density_label": density_label,
+            "density_color": density_color,
+            "inbound_count": inbound_count,
+            "outbound_count": outbound_count
         }
         try:
             if self.frame_queue.full():
@@ -389,6 +405,9 @@ class CityFlowApp(tk.Tk):
         self.trails_var = tk.BooleanVar(value=True)
         self.hud_var = tk.BooleanVar(value=True)
         self.loop_var = tk.BooleanVar(value=True)
+        self.counting_line_var = tk.BooleanVar(value=False)
+        self.direction_var = tk.BooleanVar(value=True)
+        self.color_by_track_var = tk.BooleanVar(value=True)
 
         # Vehicle class filter variables
         self.class_filters = {
@@ -828,31 +847,50 @@ class CityFlowApp(tk.Tk):
         scroll_canvas.pack(side="left", fill="both", expand=True, padx=4, pady=4)
         scrollbar.pack(side="right", fill="y")
 
-        # 1. Total Live Vehicle Count Card
-        card_total = tk.Frame(scroll_frame, bg=BG_PANEL_ALT, padx=14, pady=12, highlightthickness=1, highlightbackground=BORDER_COLOR)
-        card_total.pack(fill=tk.X, pady=(4, 8))
+        # 1. Total Live Vehicle Count Card & Traffic Density
+        top_stats = tk.Frame(scroll_frame, bg=BG_PANEL)
+        top_stats.pack(fill=tk.X, pady=(4, 8))
 
-        tk.Label(card_total, text="LIVE VEHICLES IN FRAME", font=(FONT_FAMILY, 9, "bold"), fg=TEXT_MUTED, bg=BG_PANEL_ALT).pack(anchor="w")
-        self.lbl_live_total = tk.Label(card_total, text="0", font=(FONT_FAMILY, 28, "bold"), fg=ACCENT_CYAN, bg=BG_PANEL_ALT)
+        card_total = tk.Frame(top_stats, bg=BG_PANEL_ALT, padx=12, pady=10, highlightthickness=1, highlightbackground=BORDER_COLOR)
+        card_total.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 4))
+
+        tk.Label(card_total, text="LIVE VEHICLES", font=(FONT_FAMILY, 8, "bold"), fg=TEXT_MUTED, bg=BG_PANEL_ALT).pack(anchor="w")
+        self.lbl_live_total = tk.Label(card_total, text="0", font=(FONT_FAMILY, 24, "bold"), fg=ACCENT_CYAN, bg=BG_PANEL_ALT)
         self.lbl_live_total.pack(anchor="w")
 
-        # 2. Cumulative Unique Tracked Vehicles Card
-        card_unique = tk.Frame(scroll_frame, bg=BG_PANEL_ALT, padx=14, pady=10, highlightthickness=1, highlightbackground=BORDER_COLOR)
-        card_unique.pack(fill=tk.X, pady=(0, 8))
+        card_density = tk.Frame(top_stats, bg=BG_PANEL_ALT, padx=12, pady=10, highlightthickness=1, highlightbackground=BORDER_COLOR)
+        card_density.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True, padx=(4, 0))
 
-        tk.Label(card_unique, text="TOTAL UNIQUE VEHICLES TRACKED", font=(FONT_FAMILY, 9, "bold"), fg=TEXT_MUTED, bg=BG_PANEL_ALT).pack(anchor="w")
-        self.lbl_unique_total = tk.Label(card_unique, text="0", font=(FONT_FAMILY, 20, "bold"), fg=ACCENT_GREEN, bg=BG_PANEL_ALT)
-        self.lbl_unique_total.pack(anchor="w")
+        tk.Label(card_density, text="TRAFFIC DENSITY", font=(FONT_FAMILY, 8, "bold"), fg=TEXT_MUTED, bg=BG_PANEL_ALT).pack(anchor="w")
+        self.lbl_density = tk.Label(card_density, text="SMOOTH", font=(FONT_FAMILY, 12, "bold"), fg=ACCENT_GREEN, bg=BG_PANEL_ALT)
+        self.lbl_density.pack(anchor="w", pady=(6, 0))
+
+        # 2. Cumulative Unique Tracked Vehicles & Tripwire Flow
+        flow_frame = tk.Frame(scroll_frame, bg=BG_PANEL_ALT, padx=12, pady=8, highlightthickness=1, highlightbackground=BORDER_COLOR)
+        flow_frame.pack(fill=tk.X, pady=(0, 8))
+
+        f_row1 = tk.Frame(flow_frame, bg=BG_PANEL_ALT)
+        f_row1.pack(fill=tk.X)
+        tk.Label(f_row1, text="TOTAL UNIQUE TRACKED:", font=(FONT_FAMILY, 9, "bold"), fg=TEXT_MUTED, bg=BG_PANEL_ALT).pack(side=tk.LEFT)
+        self.lbl_unique_total = tk.Label(f_row1, text="0", font=(FONT_FAMILY, 12, "bold"), fg=ACCENT_GREEN, bg=BG_PANEL_ALT)
+        self.lbl_unique_total.pack(side=tk.RIGHT)
+
+        f_row2 = tk.Frame(flow_frame, bg=BG_PANEL_ALT)
+        f_row2.pack(fill=tk.X, pady=(4, 0))
+        self.lbl_inbound = tk.Label(f_row2, text="⬇ INBOUND: 0", font=(FONT_FAMILY, 9, "bold"), fg=ACCENT_BLUE, bg=BG_PANEL_ALT)
+        self.lbl_inbound.pack(side=tk.LEFT)
+        self.lbl_outbound = tk.Label(f_row2, text="⬆ OUTBOUND: 0", font=(FONT_FAMILY, 9, "bold"), fg=ACCENT_YELLOW, bg=BG_PANEL_ALT)
+        self.lbl_outbound.pack(side=tk.RIGHT)
 
         # 3. Class Breakdown Badges
         breakdown_frame = tk.LabelFrame(
             scroll_frame,
             text=" Vehicle Breakdown by Class ",
-            font=(FONT_FAMILY, 10, "bold"),
+            font=(FONT_FAMILY, 9, "bold"),
             fg=TEXT_LIGHT,
             bg=BG_PANEL,
             padx=10,
-            pady=8,
+            pady=6,
             highlightthickness=1,
             highlightbackground=BORDER_COLOR
         )
@@ -876,9 +914,8 @@ class CityFlowApp(tk.Tk):
 
         for cls_name, emoji in class_emojis.items():
             row = tk.Frame(breakdown_frame, bg=BG_PANEL)
-            row.pack(fill=tk.X, pady=3)
+            row.pack(fill=tk.X, pady=2)
 
-            # Colored bullet pill
             bullet = tk.Label(
                 row,
                 text=f"{emoji} {cls_name}",
@@ -891,7 +928,7 @@ class CityFlowApp(tk.Tk):
             cnt_lbl = tk.Label(
                 row,
                 text="0",
-                font=(FONT_FAMILY, 10, "bold"),
+                font=(FONT_FAMILY, 9, "bold"),
                 fg=TEXT_LIGHT,
                 bg=BG_INPUT,
                 padx=8,
@@ -901,15 +938,51 @@ class CityFlowApp(tk.Tk):
             cnt_lbl.pack(side=tk.RIGHT)
             self.class_count_labels[cls_name] = cnt_lbl
 
-        # 4. Real-Time Detection Events Feed
+        # 4. Multi-Vehicle Active Roster Table
+        roster_frame = tk.LabelFrame(
+            scroll_frame,
+            text=" 🚘 Active Multi-Vehicle Inspector ",
+            font=(FONT_FAMILY, 9, "bold"),
+            fg=ACCENT_CYAN,
+            bg=BG_PANEL,
+            padx=6,
+            pady=6,
+            highlightthickness=1,
+            highlightbackground=BORDER_COLOR
+        )
+        roster_frame.pack(fill=tk.BOTH, expand=True, pady=(0, 8))
+
+        # Table Treeview
+        cols = ("id", "class", "conf", "dir", "lane")
+        self.tree_vehicles = ttk.Treeview(
+            roster_frame,
+            columns=cols,
+            show="headings",
+            height=5,
+            selectmode="browse"
+        )
+        self.tree_vehicles.heading("id", text="ID")
+        self.tree_vehicles.heading("class", text="Type")
+        self.tree_vehicles.heading("conf", text="Conf")
+        self.tree_vehicles.heading("dir", text="Direction")
+        self.tree_vehicles.heading("lane", text="Lane")
+
+        self.tree_vehicles.column("id", width=45, anchor="center")
+        self.tree_vehicles.column("class", width=65, anchor="w")
+        self.tree_vehicles.column("conf", width=45, anchor="center")
+        self.tree_vehicles.column("dir", width=100, anchor="w")
+        self.tree_vehicles.column("lane", width=85, anchor="center")
+        self.tree_vehicles.pack(fill=tk.BOTH, expand=True)
+
+        # 5. Real-Time Detection Events Feed
         events_frame = tk.LabelFrame(
             scroll_frame,
             text=" Live Activity Stream ",
-            font=(FONT_FAMILY, 10, "bold"),
+            font=(FONT_FAMILY, 9, "bold"),
             fg=TEXT_LIGHT,
             bg=BG_PANEL,
             padx=8,
-            pady=8,
+            pady=6,
             highlightthickness=1,
             highlightbackground=BORDER_COLOR
         )
@@ -917,7 +990,7 @@ class CityFlowApp(tk.Tk):
 
         self.event_listbox = tk.Listbox(
             events_frame,
-            height=7,
+            height=5,
             bg=BG_INPUT,
             fg=TEXT_LIGHT,
             selectbackground=BG_PANEL_ALT,
@@ -1321,7 +1394,7 @@ class CityFlowApp(tk.Tk):
         # 4. Tracking & Visual Overlays
         overlay_frame = tk.LabelFrame(
             scroll_frame,
-            text=" Visual Overlays & Tracking ",
+            text=" Multi-Vehicle Tracking & Analytics ",
             font=(FONT_FAMILY, 9, "bold"),
             fg=TEXT_LIGHT,
             bg=BG_PANEL,
@@ -1346,6 +1419,18 @@ class CityFlowApp(tk.Tk):
 
         tk.Checkbutton(
             overlay_frame,
+            text="Distinct Colors for Each Vehicle ID",
+            variable=self.color_by_track_var,
+            font=(FONT_FAMILY, 9),
+            fg=TEXT_LIGHT,
+            bg=BG_PANEL,
+            selectcolor=BG_INPUT,
+            activebackground=BG_PANEL,
+            command=self._on_color_by_track_toggle
+        ).pack(anchor="w", pady=1)
+
+        tk.Checkbutton(
+            overlay_frame,
             text="Show Trajectory Motion Trails",
             variable=self.trails_var,
             font=(FONT_FAMILY, 9),
@@ -1354,6 +1439,30 @@ class CityFlowApp(tk.Tk):
             selectcolor=BG_INPUT,
             activebackground=BG_PANEL,
             command=self._on_trails_toggle
+        ).pack(anchor="w", pady=1)
+
+        tk.Checkbutton(
+            overlay_frame,
+            text="Show Vehicle Movement Directions (⬆ ⬇ ➡ ⬅)",
+            variable=self.direction_var,
+            font=(FONT_FAMILY, 9),
+            fg=TEXT_LIGHT,
+            bg=BG_PANEL,
+            selectcolor=BG_INPUT,
+            activebackground=BG_PANEL,
+            command=self._on_direction_toggle
+        ).pack(anchor="w", pady=1)
+
+        tk.Checkbutton(
+            overlay_frame,
+            text="Enable Virtual Tripwire / Flow Counting Line",
+            variable=self.counting_line_var,
+            font=(FONT_FAMILY, 9),
+            fg=TEXT_LIGHT,
+            bg=BG_PANEL,
+            selectcolor=BG_INPUT,
+            activebackground=BG_PANEL,
+            command=self._on_counting_line_toggle
         ).pack(anchor="w", pady=1)
 
         tk.Checkbutton(
@@ -1738,6 +1847,21 @@ class CityFlowApp(tk.Tk):
         self.config.show_hud = self.hud_var.get()
         self.visualizer.config.show_hud = self.hud_var.get()
 
+    def _on_counting_line_toggle(self):
+        enabled = self.counting_line_var.get()
+        self.config.enable_counting_line = enabled
+        self.visualizer.config.enable_counting_line = enabled
+
+    def _on_direction_toggle(self):
+        enabled = self.direction_var.get()
+        self.config.show_direction = enabled
+        self.visualizer.config.show_direction = enabled
+
+    def _on_color_by_track_toggle(self):
+        enabled = self.color_by_track_var.get()
+        self.config.color_by_track_id = enabled
+        self.detector.config.color_by_track_id = enabled
+
     def _on_class_filter_change(self):
         self._sync_class_filters()
 
@@ -1804,23 +1928,36 @@ class CityFlowApp(tk.Tk):
         self.latency_badge.configure(text=f"{latency:.1f} ms")
         self.res_lbl.configure(text=f"{img_w}x{img_h}")
 
-        # Update Counts
+        # Update Multi-Vehicle Counts & Density
         counts = data["counts"]
         self.current_counts = counts
         live_total = sum(counts.values())
         self.lbl_live_total.configure(text=str(live_total))
         self.lbl_unique_total.configure(text=str(data["unique_tracks"]))
 
+        dens_lbl = data.get("density_label", "SMOOTH")
+        self.lbl_density.configure(text=dens_lbl)
+        self.lbl_inbound.configure(text=f"⬇ INBOUND: {data.get('inbound_count', 0)}")
+        self.lbl_outbound.configure(text=f"⬆ OUTBOUND: {data.get('outbound_count', 0)}")
+
         for cls_name, lbl in self.class_count_labels.items():
             cnt = counts.get(cls_name, 0)
             lbl.configure(text=str(cnt))
 
-        # Update Event Activity Stream for new detections
+        # Update Multi-Vehicle Active Roster Table
         detections: List[DetectedVehicle] = data.get("detections", [])
+        for item in self.tree_vehicles.get_children():
+            self.tree_vehicles.delete(item)
+        for det in detections:
+            tid = f"#{det.track_id}" if det.track_id is not None else "-"
+            conf_str = f"{int(det.confidence * 100)}%"
+            self.tree_vehicles.insert("", tk.END, values=(tid, det.class_name, conf_str, det.direction, det.lane_pos))
+
+        # Update Event Activity Stream for new detections
         for det in detections:
             if det.track_id is not None and not any(e.get("track_id") == det.track_id for e in self.session_events):
                 now_str = datetime.now().strftime("%H:%M:%S")
-                evt_text = f"[{now_str}] #{det.track_id} {det.class_name} ({int(det.confidence*100)}%)"
+                evt_text = f"[{now_str}] #{det.track_id} {det.class_name} ({int(det.confidence*100)}%) {det.direction}"
                 self.event_listbox.insert(0, evt_text)
                 if self.event_listbox.size() > 50:
                     self.event_listbox.delete(50, tk.END)
@@ -1828,7 +1965,8 @@ class CityFlowApp(tk.Tk):
                     "time": now_str,
                     "class": det.class_name,
                     "conf": f"{det.confidence:.2f}",
-                    "track_id": det.track_id
+                    "track_id": det.track_id,
+                    "dir": det.direction
                 })
 
         # Update Video Scrubber Position (if not scrubbing)

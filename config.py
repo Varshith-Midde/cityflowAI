@@ -59,6 +59,13 @@ class VehicleDetectionConfig:
     show_trails: bool = True
     trail_length: int = 25
 
+    # Multi-Vehicle and Traffic Analytics Configuration
+    enable_counting_line: bool = False
+    counting_line_y: float = 0.50
+    show_direction: bool = True
+    show_density: bool = True
+    color_by_track_id: bool = True
+
     # Snapshot and Recording output directory
     output_dir: str = "outputs"
     snapshots_dir: str = "outputs/snapshots"
