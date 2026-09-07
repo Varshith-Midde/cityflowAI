@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CityFlow AI — Centralized Traffic Intelligence & Smart City Platform 🇮🇳</title>
+  <meta name="description" content="AI-Powered Centralized Real-Time Traffic Density Monitoring, Smart Rider Routing, RoadGuard Citizen Reporting, and Multi-Agency Municipal Operations Platform." />
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="top-nav">
+    <div class="nav-brand">
+      <div class="logo-badge">
+        <i class="fa-solid fa-brain-circuit"></i>
+      </div>
+      <div>
+        <div class="brand-title">CITYFLOW <span>AI</span> 🇮🇳</div>
+        <div class="brand-subtitle" id="topAuthoritySubtitle">Centralized Traffic Intelligence & Municipal Ops</div>
+      </div>
+      <div class="connection-status-pill" id="wsStatusPill">
+        <span class="status-dot pulsing"></span>
+        <span id="wsStatusText">CONNECTING...</span>
+      </div>
+    </div>
+
+    <!-- India-Wide City Switcher -->
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <label for="citySelector" style="font-size: 11px; color: var(--text-muted); font-weight: 700;">METRO:</label>
+      <select id="citySelector" class="form-control" style="width: 210px; background: rgba(0,0,0,0.4); border-color: var(--border-focus); color: #fff; font-weight: 600; padding: 5px 8px; font-size: 12px;">
+        <option value="hyderabad">🇮🇳 Hyderabad (GHMC)</option>
+        <option value="bengaluru">🇮🇳 Bengaluru (BBMP)</option>
+        <option value="mumbai">🇮🇳 Mumbai (BMC)</option>
+        <option value="delhi">🇮🇳 Delhi NCR (MCD)</option>
+        <option value="pune">🇮🇳 Pune (PMC)</option>
+        <option value="chennai">🇮🇳 Chennai (GCC)</option>
+      </select>
+    </div>
+
+    <!-- Top KPI Banners -->
+    <div class="kpi-banner">
+      <div class="kpi-item">
+        <span class="kpi-label"><i class="fa-solid fa-car"></i> Active Vehicles</span>
+        <span class="kpi-value" id="kpiVehicles">--</span>
+      </div>
+      <div class="kpi-item">
+        <span class="kpi-label"><i class="fa-solid fa-triangle-exclamation"></i> Congestion</span>
+        <span class="kpi-value warning" id="kpiCongestion">--%</span>
+      </div>
+      <div class="kpi-item">
+        <span class="kpi-label"><i class="fa-solid fa-gauge-high"></i> City Avg Speed</span>
+        <span class="kpi-value" id="kpiSpeed">-- km/h</span>
+      </div>
+      <div class="kpi-item">
+        <span class="kpi-label"><i class="fa-solid fa-truck-medical"></i> EMS Units</span>
+        <span class="kpi-value emergency" id="kpiAmbulances">0 Active</span>
+      </div>
+      <div class="kpi-item">
+        <span class="kpi-label"><i class="fa-solid fa-bell"></i> Open Incidents</span>
+        <span class="kpi-value alert" id="kpiIncidents">0</span>
+      </div>
+    </div>
+
+    <!-- Quick Global Actions & Navigation Links -->
+    <div class="nav-actions">
+      <a href="fast-route.html" class="action-btn btn-cyan" style="text-decoration:none;" title="Dedicated Fast Route Page">
+        <i class="fa-solid fa-route"></i> Fast Route
+      </a>
+      <a href="municipal.html" class="action-btn btn-amber" style="text-decoration:none;" title="Municipal Operations Command">
+        <i class="fa-solid fa-landmark"></i> Municipal
+      </a>
+      <button class="action-btn btn-purple" id="btnToggleVoiceAssistant" title="Trigger CITYFLOW AI Voice Assistant">
+        <i class="fa-solid fa-microphone"></i> AI Voice
+      </button>
+      <button class="action-btn btn-amber" id="btnQuickOptimize" title="Trigger AI Signal Optimization">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> Optimize
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-layout">
+    <!-- Left Navigation Sidebar: Categorized into Transportation, Logistics, City Resources, RoadGuard -->
+    <aside class="sidebar-nav">
+      <!-- 1. TRANSPORTATION -->
+      <div class="nav-category-header">
+        <i class="fa-solid fa-traffic-light"></i> 1. TRANSPORTATION
+      </div>
+
+      <button class="nav-tab active" data-tab="smart-traffic">
+        <i class="fa-solid fa-gauge-high text-cyan"></i>
+        <span>Smart Traffic & AI Prediction</span>
+      </button>
+
+      <button class="nav-tab" data-tab="routing">
+        <i class="fa-solid fa-route"></i>
+        <span>Rider Route Planner</span>
+      </button>
+
+      <button class="nav-tab" data-tab="ambulance">
+        <i class="fa-solid fa-truck-medical"></i>
+        <span>Smart Ambulance EMS</span>
+      </button>
+
+      <button class="nav-tab" data-tab="signals">
+        <i class="fa-solid fa-traffic-light"></i>
+        <span>AI Traffic Signals</span>
+      </button>
+
+      <button class="nav-tab" data-tab="accidents">
+        <i class="fa-solid fa-car-burst"></i>
+        <span>Accident Detection</span>
+      </button>
+
+      <button class="nav-tab" data-tab="transit">
+        <i class="fa-solid fa-bus"></i>
+        <span>Public Transit Flow</span>
+      </button>
+
+      <!-- 2. LOGISTICS -->
+      <div class="nav-category-header">
+        <i class="fa-solid fa-truck-fast"></i> 2. LOGISTICS
+      </div>
+
+      <button class="nav-tab" data-tab="logistics">
+        <i class="fa-solid fa-truck-fast"></i>
+        <span>Smart Logistics VRP</span>
+      </button>
+
+      <!-- 3. CITY RESOURCES -->
+      <div class="nav-category-header">
+        <i class="fa-solid fa-city"></i> 3. CITY RESOURCES
+      </div>
+
+      <button class="nav-tab" data-tab="parking">
+        <i class="fa-solid fa-square-parking"></i>
+        <span>Smart Parking</span>
+      </button>
+
+      <button class="nav-tab" data-tab="waste">
+        <i class="fa-solid fa-dumpster"></i>
+        <span>Smart Waste Logistics</span>
+      </button>
+
+      <button class="nav-tab" data-tab="flood">
+        <i class="fa-solid fa-water"></i>
+        <span>Urban Flood & Drainage</span>
+      </button>
+
+      <!-- 4. ROADGUARD -->
+      <div class="nav-category-header">
+        <i class="fa-solid fa-shield-halved text-red"></i> 4. ROADGUARD
+      </div>
+
+      <button class="nav-tab" data-tab="roadguard">
+        <i class="fa-solid fa-camera text-red"></i>
+        <span>Citizen Road Reporting</span>
+      </button>
+
+      <button class="nav-tab" data-tab="cctv-demo">
+        <i class="fa-solid fa-video text-amber"></i>
+        <span>CCTV AI Stream (DEMO)</span>
+      </button>
+
+      <!-- Traffic Intensity Slider -->
+      <div class="traffic-slider-box" style="margin-top: auto;">
+        <div class="slider-header">
+          <span>Traffic Flow Density</span>
+          <span id="sliderIntensityVal">1.0x</span>
+        </div>
+        <input type="range" id="simIntensitySlider" min="0.3" max="2.5" step="0.1" value="1.0" />
+        <div class="slider-labels">
+          <span>Off-Peak</span>
+          <span>Rush Hour</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Center View: Interactive Map Viewport -->
+    <main class="map-viewport">
+      <div id="cityMap"></div>
+
+      <!-- Map Legend Overlay -->
+      <div class="map-legend">
+        <div class="legend-title">LIVE DENSITY</div>
+        <div class="legend-row"><span class="legend-dot green"></span> Smooth (<15 v)</div>
+        <div class="legend-row"><span class="legend-dot yellow"></span> Moderate (15-30 v)</div>
+        <div class="legend-row"><span class="legend-dot red"></span> Congested (>30 v)</div>
+        <div class="legend-row"><span class="legend-dot blocked"></span> Blocked / Incident</div>
+        <div class="legend-row"><span class="legend-dot blue"></span> Flooded Corridor</div>
+        <div class="legend-row"><span class="legend-dot" style="background:#ff2020; box-shadow:0 0 8px #ff4b2b;"></span> 3 Red Zones 🔴</div>
+      </div>
+
+      <!-- Active Emergency Banner on Map -->
+      <div class="emergency-floating-banner" id="activeEmergencyBanner" style="display: none;">
+        <i class="fa-solid fa-truck-medical fa-beat"></i>
+        <div>
+          <strong id="emergencyBannerTitle">EMS Unit Dispatched</strong>
+          <div id="emergencyBannerDesc">Green-wave priority route cleared</div>
+        </div>
+      </div>
+
+      <!-- Emergency Road Hazard Commute Alert Banner -->
+      <div class="emergency-road-alert-banner" id="emergencyRoadAlert" style="display: none;">
+        <i class="fa-solid fa-triangle-exclamation fa-beat text-red"></i>
+        <div style="flex: 1;">
+          <strong id="roadAlertTitle">COMMUTE ROAD ALERT</strong>
+          <div id="roadAlertDesc" style="font-size: 11px; opacity: 0.9;">Severe pothole detected on your commute corridor!</div>
+        </div>
+        <button class="alert-dismiss-btn" id="btnDismissRoadAlert">&times;</button>
+      </div>
+    </main>
+
+    <!-- Right Drawer: Active Module Inspector & Controls -->
+    <section class="module-drawer">
+      <!-- 0. SMART TRAFFIC PANEL (Primary Landing Module) -->
+      <div class="module-panel active" id="panel-smart-traffic">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-gauge-high text-cyan"></i> Smart Traffic & Prediction</h3>
+          <span class="badge badge-cyan">AI Core</span>
+        </div>
+        <p class="panel-desc">Real-time corridor density query, Saved Places routing, AI rush-hour surge forecasting, and 3 Red Zones avoidance.</p>
+
+        <!-- Saved Places Quick Chips -->
+        <div style="margin-bottom: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px;">
+            <span style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">
+              <i class="fa-solid fa-bookmark"></i> Saved Places (Quick Fill):
+            </span>
+            <button class="link-btn" id="btnManageSavedPlacesModal">
+              <i class="fa-solid fa-gear"></i> Manage
+            </button>
+          </div>
+          <div class="saved-chips-row" id="homeSavedPlacesChips">
+            <button class="place-chip" data-type="home" id="homeChipHome"><i class="fa-solid fa-house"></i> Home</button>
+            <button class="place-chip" data-type="work" id="homeChipWork"><i class="fa-solid fa-briefcase"></i> Work</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="smartFromZone"><i class="fa-solid fa-circle-dot" style="color:#00f2fe;"></i> From Area:</label>
+          <select id="smartFromZone" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="smartToZone"><i class="fa-solid fa-location-dot" style="color:#ff4b2b;"></i> To Area:</label>
+          <select id="smartToZone" class="form-control"></select>
+        </div>
+
+        <div class="button-group mb-3">
+          <button class="btn-primary" id="btnShowTraffic" style="flex: 1;">
+            <i class="fa-solid fa-magnifying-glass-chart"></i> Show Traffic
+          </button>
+          <button class="btn-secondary" id="btnViewFastRouteDirect" style="flex: 1; border-color:var(--accent-cyan); color:var(--accent-cyan);">
+            <i class="fa-solid fa-route"></i> View Fast Route
+          </button>
+        </div>
+
+        <!-- Live Traffic Percentage & Results Card -->
+        <div id="smartTrafficResultCard" class="traffic-result-box" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span style="font-weight: 700; font-size: 13px;">Corridor Traffic Density:</span>
+            <span class="badge badge-amber" id="smartTrafficStatusBadge">78% HEAVY</span>
+          </div>
+          <div style="background: rgba(255,255,255,0.08); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+            <div id="smartTrafficMeterBar" style="background: linear-gradient(90deg, #38ef7d, #f59e0b, #ff4b2b); width: 78%; height: 100%;"></div>
+          </div>
+          <div class="route-stat-grid" style="margin-bottom: 10px;">
+            <div class="stat-box">
+              <span class="stat-num text-cyan" id="smartEta">16.4</span>
+              <span class="stat-unit">mins ETA</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="smartDistance">5.2</span>
+              <span class="stat-unit">km Distance</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num text-green" id="smartDelaySaved">310</span>
+              <span class="stat-unit">s Delay Saved</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Traffic Prediction Forecast Widget -->
+        <div class="ai-prediction-widget" id="aiPredictionWidget" style="margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 12px; font-weight: 800; color: var(--accent-cyan);">
+              <i class="fa-solid fa-brain"></i> AI TRAFFIC PREDICTION
+            </span>
+            <span class="badge badge-green" style="font-size: 9px;">94.6% Conf</span>
+          </div>
+          <div class="prediction-horizons-grid">
+            <div class="pred-horizon-item">
+              <span class="pred-label">+15 Mins</span>
+              <span class="pred-val text-amber" id="pred15Val">--%</span>
+              <span class="pred-delta" id="pred15Delta">+4%</span>
+            </div>
+            <div class="pred-horizon-item peak">
+              <span class="pred-label">+30 Mins (Peak)</span>
+              <span class="pred-val text-red" id="pred30Val">--%</span>
+              <span class="pred-delta" id="pred30Delta">+18% 🔴</span>
+            </div>
+            <div class="pred-horizon-item">
+              <span class="pred-label">+60 Mins</span>
+              <span class="pred-val text-green" id="pred60Val">--%</span>
+              <span class="pred-delta" id="pred60Delta">-12%</span>
+            </div>
+          </div>
+          <div class="ai-recommendation-note" id="aiRecommendationText">
+            <i class="fa-solid fa-lightbulb text-amber"></i> AI Recommendation: Depart now before the 30-min rush hour surge.
+          </div>
+        </div>
+
+        <!-- 🔴 3 RED ZONES ONLY WIDGET -->
+        <div class="redzones-home-widget" style="margin-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 12px; font-weight: 800; color: #ff6b6b;">
+              <i class="fa-solid fa-triangle-exclamation fa-beat"></i> 3 RED ZONES ONLY 🔴
+            </span>
+            <span class="badge badge-red" style="font-size: 9px;">CHOKE POINTS</span>
+          </div>
+          <div class="redzones-cards-list" id="homeRedZonesList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. ROUTING PANEL (Existing Dynamic Dijkstra) -->
+      <div class="module-panel" id="panel-routing">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-route"></i> Rider Smart Route Planner</h3>
+          <span class="badge badge-cyan">Dynamic Dijkstra</span>
+        </div>
+        <p class="panel-desc">Calculates real-time congestion-penalized paths for city commuters, automatically bypassing traffic bottlenecks and accidents.</p>
+
+        <div class="form-group">
+          <label for="routeOrigin">Origin Zone:</label>
+          <select id="routeOrigin" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="routeDest">Destination Zone:</label>
+          <select id="routeDest" class="form-control"></select>
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="routeEmergencyMode" />
+            <span>Emergency Siren Priority</span>
+          </label>
+        </div>
+
+        <button class="btn-primary w-100" id="btnCalculateRoute">
+          <i class="fa-solid fa-magnifying-glass-location"></i> Find Fastest Route
+        </button>
+
+        <div id="routeResultsCard" class="route-summary-card" style="display: none;">
+          <div class="route-stat-grid">
+            <div class="stat-box">
+              <span class="stat-num" id="resDistance">--</span>
+              <span class="stat-unit">km</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num text-cyan" id="resDuration">--</span>
+              <span class="stat-unit">mins</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num text-green" id="resDelaySaved">--</span>
+              <span class="stat-unit">s saved</span>
+            </div>
+          </div>
+          <div id="routeTurnByTurn" class="turn-steps-list"></div>
+        </div>
+      </div>
+
+      <!-- 2. AMBULANCE PANEL (Existing) -->
+      <div class="module-panel" id="panel-ambulance">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-truck-medical"></i> Smart Ambulance Routing</h3>
+          <span class="badge badge-red">Life Safety</span>
+        </div>
+        <p class="panel-desc">Green-wave corridor preemption clearing traffic lights ahead of trauma ambulances.</p>
+
+        <div class="form-group">
+          <label for="ambPickupZone">Emergency Pickup Location:</label>
+          <select id="ambPickupZone" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label for="ambHospZone">Hospital Trauma Center:</label>
+          <select id="ambHospZone" class="form-control"></select>
+        </div>
+
+        <button class="btn-emergency w-100" id="btnDispatchAmbulance">
+          <i class="fa-solid fa-siren fa-beat"></i> Dispatch Emergency Ambulance
+        </button>
+
+        <div class="section-subtitle">Active Emergency Missions</div>
+        <div id="activeAmbulancesList" class="items-list">
+          <div class="empty-state">No active emergency missions</div>
+        </div>
+      </div>
+
+      <!-- 3. SIGNALS PANEL (Existing) -->
+      <div class="module-panel" id="panel-signals">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-traffic-light"></i> AI Adaptive Traffic Signals</h3>
+          <span class="badge badge-amber">Demand Responsive</span>
+        </div>
+        <p class="panel-desc">Real-time vehicle queue optimization dynamically allocating green-phase seconds based on camera vehicle counts.</p>
+
+        <button class="btn-secondary w-100 mb-3" id="btnOptimizeSignals">
+          <i class="fa-solid fa-brain"></i> Recompute AI Signal Splits
+        </button>
+
+        <div id="signalsList" class="items-list"></div>
+      </div>
+
+      <!-- 4. ACCIDENT DETECTION PANEL (Existing) -->
+      <div class="module-panel" id="panel-accidents">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-car-burst"></i> Road Accident Detection</h3>
+          <span class="badge badge-red">CV Telemetry</span>
+        </div>
+        <p class="panel-desc">Computer vision velocity anomaly and stopped-vehicle detection in active lanes.</p>
+
+        <div class="form-group">
+          <label for="accidentZoneSelect">Inject Incident into Zone:</label>
+          <select id="accidentZoneSelect" class="form-control"></select>
+        </div>
+
+        <button class="btn-danger w-100 mb-3" id="btnTriggerAccident">
+          <i class="fa-solid fa-triangle-exclamation"></i> Simulate Traffic Collision
+        </button>
+
+        <div class="section-subtitle">Active Accidents & Lane Closures</div>
+        <div id="accidentsList" class="items-list"></div>
+      </div>
+
+      <!-- 5. PARKING PANEL (Existing) -->
+      <div class="module-panel" id="panel-parking">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-square-parking"></i> Intelligent Smart Parking</h3>
+          <span class="badge badge-green">Demand Prediction</span>
+        </div>
+        <p class="panel-desc">Live parking capacity monitoring and automated nearest-slot navigation.</p>
+
+        <div class="form-group">
+          <label for="parkingDestSelect">Rider Destination:</label>
+          <select id="parkingDestSelect" class="form-control"></select>
+        </div>
+
+        <button class="btn-primary w-100 mb-3" id="btnFindParking">
+          <i class="fa-solid fa-square-parking"></i> Find Closest Available Parking
+        </button>
+
+        <div id="parkingFacilitiesList" class="items-list"></div>
+      </div>
+
+      <!-- 6. TRANSIT PANEL (Existing) -->
+      <div class="module-panel" id="panel-transit">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-bus"></i> Smart Public Transport</h3>
+          <span class="badge badge-cyan">Transit Flow</span>
+        </div>
+        <p class="panel-desc">Dynamic detour routing and headway spacing for municipal buses around traffic bottlenecks.</p>
+
+        <button class="btn-secondary w-100 mb-3" id="btnOptimizeTransit">
+          <i class="fa-solid fa-shuffle"></i> Evaluate Transit Detours
+        </button>
+
+        <div id="transitLinesList" class="items-list"></div>
+      </div>
+
+      <!-- 7. LOGISTICS PANEL (Existing) -->
+      <div class="module-panel" id="panel-logistics">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-truck-fast"></i> Smart Logistics Route Optimization</h3>
+          <span class="badge badge-blue">VRP Optimization</span>
+        </div>
+        <p class="panel-desc">Multi-stop delivery tour sequencing bypassing congestion to lower fuel burn and CO2 emissions.</p>
+
+        <button class="btn-primary w-100 mb-3" id="btnOptimizeLogistics">
+          <i class="fa-solid fa-route"></i> Optimize Freight Fleet Routes
+        </button>
+
+        <div id="logisticsFleetList" class="items-list"></div>
+      </div>
+
+      <!-- 8. WASTE PANEL (Existing under City Resources) -->
+      <div class="module-panel" id="panel-waste">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-dumpster"></i> Smart Waste Management</h3>
+          <span class="badge badge-green">City Resources</span>
+        </div>
+        <p class="panel-desc">Predicts container overflow and routes garbage collection trucks only to bins requiring service.</p>
+
+        <button class="btn-primary w-100 mb-3" id="btnPlanWasteCollection">
+          <i class="fa-solid fa-truck-pickup"></i> Plan Green Collection Tour
+        </button>
+
+        <div id="wasteBinsList" class="items-list"></div>
+      </div>
+
+      <!-- 9. FLOOD PANEL (Existing under City Resources - Sustainability badge removed) -->
+      <div class="module-panel" id="panel-flood">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-water"></i> Urban Flood & Drainage System</h3>
+          <span class="badge badge-blue">City Resources</span>
+        </div>
+        <p class="panel-desc">Catchment runoff prediction, ultrasonic water sensors, and automated road closure alerts.</p>
+
+        <div class="form-group">
+          <label>Precipitation Intensity (mm/h): <strong id="rainValText">0 mm/h</strong></label>
+          <input type="range" id="rainSlider" min="0" max="60" value="0" />
+        </div>
+
+        <div class="button-group mb-3">
+          <button class="btn-primary" id="btnApplyRain">Apply Storm</button>
+          <button class="btn-secondary" id="btnClearFlood">Clear Water Levels</button>
+        </div>
+
+        <div id="floodSensorsList" class="items-list"></div>
+      </div>
+
+      <!-- 10. ROADGUARD CITIZEN REPORTING PANEL -->
+      <div class="module-panel" id="panel-roadguard">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-camera text-red"></i> RoadGuard Citizen Triage</h3>
+          <span class="badge badge-red">AI Detection</span>
+        </div>
+        <p class="panel-desc">Citizen road damage reporting with AI computer vision severity analysis and real-time municipal repair status.</p>
+
+        <button class="btn-primary w-100 mb-3" id="btnOpenReportModal" style="background:linear-gradient(135deg, #ff4b2b, #ff416c);">
+          <i class="fa-solid fa-camera"></i> Report Damaged Road
+        </button>
+
+        <div class="section-subtitle" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>Active Road Damage Reports</span>
+          <span class="badge badge-amber" id="roadGuardCountBadge">0 Active</span>
+        </div>
+        <div id="roadGuardReportsList" class="items-list"></div>
+      </div>
+
+      <!-- 11. CCTV AI MONITORING DEMO PANEL -->
+      <div class="module-panel" id="panel-cctv-demo">
+        <div class="panel-header">
+          <h3><i class="fa-solid fa-video text-amber"></i> CCTV AI Monitoring Demo</h3>
+          <span class="badge badge-amber">Concept Demo</span>
+        </div>
+        <p class="panel-desc">Real-time computer vision demonstration analyzing road surface distress, lane obstruction, and vehicular flow.</p>
+
+        <!-- CCTV Video Container with Prominent DEMO Watermark -->
+        <div class="cctv-demo-player">
+          <div class="cctv-demo-watermark">⚠️ DEMO — CCTV AI STREAM</div>
+          <canvas id="cctvCanvas" width="400" height="240"></canvas>
+          <div class="cctv-hud-telemetry">
+            <div><i class="fa-solid fa-circle text-green fa-beat"></i> LIVE 30 FPS</div>
+            <div>CAM-AI-04 • ROAD STATUS: MONITORED</div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 10px; line-height: 1.4;">
+          <strong>Notice:</strong> This live feed runs our AI road inspection algorithm in simulation mode to demonstrate automated municipal monitoring capabilities.
+        </div>
+      </div>
+
+      <!-- Bottom Real-Time Event Log -->
+      <div class="live-event-ticker">
+        <div class="ticker-title"><i class="fa-solid fa-tower-broadcast"></i> REAL-TIME TELEMETRY FEED</div>
+        <div id="eventLogContainer" class="ticker-content"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Citizen Road Damage Reporting Modal -->
+  <div class="muni-modal-backdrop" id="citizenReportModal">
+    <div class="muni-modal-card">
+      <div class="muni-modal-header">
+        <h3 style="margin:0; font-size:16px; font-weight:700;"><i class="fa-solid fa-camera text-cyan"></i> Report Damaged Road</h3>
+        <button id="btnCloseReportModal" style="background:none; border:none; color:#888; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="muni-modal-body">
+        <div class="form-group">
+          <label>Photo Evidence (Upload or Preset Sample):</label>
+          <div class="preset-photos-grid">
+            <button type="button" class="btn-preset-photo active" data-type="Severe Pothole (Grade 4 Hazard)" data-img="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80">
+              <i class="fa-solid fa-road"></i> Pothole
+            </button>
+            <button type="button" class="btn-preset-photo" data-type="Structural Asphalt Fissure" data-img="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=600&auto=format&fit=crop&q=80">
+              <i class="fa-solid fa-burst"></i> Surface Crack
+            </button>
+            <button type="button" class="btn-preset-photo" data-type="Hazardous Manhole / Grate Dislodged" data-img="https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=600&auto=format&fit=crop&q=80">
+              <i class="fa-solid fa-circle-notch"></i> Open Manhole
+            </button>
+            <button type="button" class="btn-preset-photo" data-type="Road Subsidence & Cavitation" data-img="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80">
+              <i class="fa-solid fa-angles-down"></i> Subsidence
+            </button>
+          </div>
+          <div id="selectedPhotoPreview" style="margin-top: 8px; text-align: center;">
+            <img id="reportPhotoImg" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=600&auto=format&fit=crop&q=80" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-subtle);" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reportTitle">Hazard Title:</label>
+          <input type="text" id="reportTitle" class="form-control" value="Severe Pothole on Active Traffic Lane" />
+        </div>
+
+        <div class="form-group">
+          <label for="reportDesc">Description:</label>
+          <textarea id="reportDesc" class="form-control" rows="2" placeholder="Describe the road hazard, lane location, and vehicular danger..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reportZoneSelect">Location / Nearest Zone:</label>
+          <div style="display: flex; gap: 8px;">
+            <select id="reportZoneSelect" class="form-control" style="flex: 1;"></select>
+            <button class="btn-secondary" id="btnAutoLocation" style="white-space: nowrap;">
+              <i class="fa-solid fa-crosshairs"></i> Auto GPS
+            </button>
+          </div>
+          <span id="autoGpsNotice" style="font-size: 10px; color: var(--accent-cyan); display: none; margin-top: 4px;"></span>
+        </div>
+
+        <button class="btn-primary w-100" id="btnSubmitCitizenReport" style="padding: 12px; font-weight: 700;">
+          <i class="fa-solid fa-paper-plane"></i> Run AI Analysis & Submit Report
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Places Management Modal -->
+  <div class="muni-modal-backdrop" id="savedPlacesModal">
+    <div class="muni-modal-card" style="max-width: 500px;">
+      <div class="muni-modal-header">
+        <h3 style="margin:0; font-size:15px; font-weight:700;"><i class="fa-solid fa-bookmark text-cyan"></i> Manage Saved Places</h3>
+        <button id="btnCloseSavedModal" style="background:none; border:none; color:#888; font-size:20px; cursor:pointer;">&times;</button>
+      </div>
+      <div class="muni-modal-body">
+        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+          Configure your permanent <strong>Home</strong> (1), <strong>Work</strong> (1), and up to <strong>5 Custom</strong> saved places for quick 1-click routing.
+        </div>
+
+        <div class="form-group">
+          <label>🏠 Home Zone:</label>
+          <select id="saveHomeSelect" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label>💼 Work Zone:</label>
+          <select id="saveWorkSelect" class="form-control"></select>
+        </div>
+
+        <div class="form-group">
+          <label>📍 Add Custom Place (Max 5):</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="customPlaceNameInput" class="form-control" placeholder="Place Name (e.g. Gym, Airport)" style="flex: 1;" />
+            <select id="saveCustomZoneSelect" class="form-control" style="flex: 1;"></select>
+            <button class="btn-secondary" id="btnAddCustomPlaceBtn"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        </div>
+
+        <div id="customPlacesList" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;"></div>
+
+        <button class="btn-primary w-100" id="btnSavePlacesSubmit" style="margin-top: 16px;">
+          <i class="fa-solid fa-floppy-disk"></i> Save Preferences
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating CITYFLOW AI Voice Assistant Widget -->
+  <div class="floating-voice-widget" id="voiceAssistantWidget">
+    <button class="voice-mic-trigger" id="voiceMicButton" title="Ask CityFlow AI Voice Assistant">
+      <i class="fa-solid fa-microphone"></i>
+      <div class="voice-sound-waves" id="voiceWaveAnimation" style="display:none;">
+        <span></span><span></span><span></span><span></span>
+      </div>
+    </button>
+    <div class="voice-transcript-card" id="voiceTranscriptCard" style="display: none;">
+      <div class="voice-card-header">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-brain-circuit text-cyan"></i>
+          <strong>CITYFLOW Voice AI</strong>
+        </div>
+        <button id="btnCloseVoiceCard" style="background:none; border:none; color:#888; cursor:pointer;">&times;</button>
+      </div>
+      <div class="voice-transcript-text" id="voiceTranscriptText">
+        "Listening... Say 'What's the traffic on my route?' or 'Find the fastest route' or 'Are there road problems?'"
+      </div>
+      <div class="voice-quick-prompts">
+        <button class="prompt-chip" onclick="handleVoiceQuery('traffic on my route')">Route Traffic</button>
+        <button class="prompt-chip" onclick="handleVoiceQuery('fastest route')">Fast Route</button>
+        <button class="prompt-chip" onclick="handleVoiceQuery('road problems')">Road Hazards</button>
+        <button class="prompt-chip" onclick="handleVoiceQuery('show red zones')">3 Red Zones</button>
+      </div>
+      <div style="display:flex; gap:6px; margin-top:8px;">
+        <input type="text" id="voiceFallbackInput" class="form-control" placeholder="Or type a question..." style="font-size:12px; padding:6px 8px;" />
+        <button class="btn-primary" id="btnSendVoiceText" style="padding:6px 10px;"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <!-- Application JS -->
+  <script src="app.js"></script>
+</body>
+</html>

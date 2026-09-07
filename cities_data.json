@@ -1,0 +1,797 @@
+{
+  "cities": {
+    "hyderabad": {
+      "city_id": "hyderabad",
+      "city_name": "Hyderabad (Cyberabad)",
+      "state": "Telangana",
+      "authority": "Greater Hyderabad Municipal Corporation (GHMC)",
+      "center": {"lat": 17.4435, "lng": 78.3772, "zoom": 14},
+      "zones": [
+        {
+          "id": "zone_hitech_junction",
+          "name": "Hi-Tech City Junction",
+          "type": "intersection",
+          "lat": 17.4485,
+          "lng": 78.3740,
+          "camera_id": "CAM-HYD-01",
+          "signal_id": "SIG-HYD-01",
+          "base_capacity": 50,
+          "connections": [
+            {"to": "zone_cyber_towers", "distance_km": 1.2, "speed_limit": 50},
+            {"to": "zone_expressway_north", "distance_km": 2.1, "speed_limit": 80},
+            {"to": "zone_it_corridor", "distance_km": 1.5, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "zone_cyber_towers",
+          "name": "Cyber Towers Circle",
+          "type": "commercial",
+          "lat": 17.4504,
+          "lng": 78.3809,
+          "camera_id": "CAM-HYD-02",
+          "signal_id": "SIG-HYD-02",
+          "base_capacity": 65,
+          "connections": [
+            {"to": "zone_hitech_junction", "distance_km": 1.2, "speed_limit": 50},
+            {"to": "zone_metro_station", "distance_km": 0.9, "speed_limit": 40},
+            {"to": "zone_market_square", "distance_km": 1.6, "speed_limit": 45}
+          ]
+        },
+        {
+          "id": "zone_metro_station",
+          "name": "Metro Transit Interchange",
+          "type": "transit_hub",
+          "lat": 17.4470,
+          "lng": 78.3860,
+          "camera_id": "CAM-HYD-03",
+          "signal_id": "SIG-HYD-03",
+          "base_capacity": 40,
+          "bus_lines": ["Line-101", "Line-204", "Express-Airport"],
+          "connections": [
+            {"to": "zone_cyber_towers", "distance_km": 0.9, "speed_limit": 40},
+            {"to": "zone_tech_park_parking", "distance_km": 0.7, "speed_limit": 30},
+            {"to": "zone_central_hospital", "distance_km": 1.8, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "zone_central_hospital",
+          "name": "Metro General Hospital & Trauma Center",
+          "type": "hospital",
+          "lat": 17.4410,
+          "lng": 78.3910,
+          "camera_id": "CAM-HYD-04",
+          "signal_id": "SIG-HYD-04",
+          "base_capacity": 35,
+          "is_hospital": true,
+          "connections": [
+            {"to": "zone_metro_station", "distance_km": 1.8, "speed_limit": 50},
+            {"to": "zone_market_square", "distance_km": 1.3, "speed_limit": 40},
+            {"to": "zone_ring_road_south", "distance_km": 2.4, "speed_limit": 70}
+          ]
+        },
+        {
+          "id": "zone_it_corridor",
+          "name": "Silicon IT Corridor",
+          "type": "commercial",
+          "lat": 17.4380,
+          "lng": 78.3710,
+          "camera_id": "CAM-HYD-05",
+          "signal_id": "SIG-HYD-05",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "zone_hitech_junction", "distance_km": 1.5, "speed_limit": 50},
+            {"to": "zone_gachibowli_stadium", "distance_km": 2.0, "speed_limit": 60},
+            {"to": "zone_financial_district", "distance_km": 2.5, "speed_limit": 60}
+          ]
+        },
+        {
+          "id": "zone_financial_district",
+          "name": "Financial District SEZ",
+          "type": "commercial",
+          "lat": 17.4260,
+          "lng": 78.3580,
+          "camera_id": "CAM-HYD-06",
+          "signal_id": "SIG-HYD-06",
+          "base_capacity": 60,
+          "connections": [
+            {"to": "zone_it_corridor", "distance_km": 2.5, "speed_limit": 60},
+            {"to": "zone_gachibowli_stadium", "distance_km": 1.8, "speed_limit": 50},
+            {"to": "zone_ring_road_south", "distance_km": 3.0, "speed_limit": 80}
+          ]
+        },
+        {
+          "id": "zone_gachibowli_stadium",
+          "name": "Gachibowli Stadium Junction",
+          "type": "intersection",
+          "lat": 17.4420,
+          "lng": 78.3520,
+          "camera_id": "CAM-HYD-07",
+          "signal_id": "SIG-HYD-07",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "zone_financial_district", "distance_km": 1.8, "speed_limit": 50},
+            {"to": "zone_it_corridor", "distance_km": 2.0, "speed_limit": 60},
+            {"to": "zone_expressway_north", "distance_km": 3.2, "speed_limit": 80}
+          ]
+        },
+        {
+          "id": "zone_market_square",
+          "name": "Madhapur Market Square",
+          "type": "residential",
+          "lat": 17.4450,
+          "lng": 78.3950,
+          "camera_id": "CAM-HYD-08",
+          "base_capacity": 45,
+          "connections": [
+            {"to": "zone_cyber_towers", "distance_km": 1.6, "speed_limit": 45},
+            {"to": "zone_central_hospital", "distance_km": 1.3, "speed_limit": 40},
+            {"to": "zone_jubilee_hills_gate", "distance_km": 2.2, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "zone_jubilee_hills_gate",
+          "name": "Jubilee Hills Checkpost",
+          "type": "residential",
+          "lat": 17.4320,
+          "lng": 78.4070,
+          "camera_id": "CAM-HYD-09",
+          "signal_id": "SIG-HYD-09",
+          "base_capacity": 50,
+          "connections": [
+            {"to": "zone_market_square", "distance_km": 2.2, "speed_limit": 50},
+            {"to": "zone_ring_road_south", "distance_km": 2.8, "speed_limit": 60}
+          ]
+        },
+        {
+          "id": "zone_tech_park_parking",
+          "name": "Smart Tech Park Multilevel Parking",
+          "type": "parking",
+          "lat": 17.4490,
+          "lng": 78.3890,
+          "camera_id": "CAM-HYD-10",
+          "base_capacity": 30,
+          "parking_total_spots": 120,
+          "connections": [
+            {"to": "zone_metro_station", "distance_km": 0.7, "speed_limit": 30},
+            {"to": "zone_market_square", "distance_km": 1.1, "speed_limit": 35}
+          ]
+        },
+        {
+          "id": "zone_expressway_north",
+          "name": "Outer Ring Road (North Sector)",
+          "type": "expressway",
+          "lat": 17.4620,
+          "lng": 78.3650,
+          "camera_id": "CAM-HYD-11",
+          "base_capacity": 80,
+          "connections": [
+            {"to": "zone_hitech_junction", "distance_km": 2.1, "speed_limit": 80},
+            {"to": "zone_gachibowli_stadium", "distance_km": 3.2, "speed_limit": 80}
+          ]
+        },
+        {
+          "id": "zone_ring_road_south",
+          "name": "Outer Ring Road (South Sector)",
+          "type": "expressway",
+          "lat": 17.4200,
+          "lng": 78.3850,
+          "camera_id": "CAM-HYD-12",
+          "base_capacity": 85,
+          "connections": [
+            {"to": "zone_central_hospital", "distance_km": 2.4, "speed_limit": 70},
+            {"to": "zone_financial_district", "distance_km": 3.0, "speed_limit": 80},
+            {"to": "zone_jubilee_hills_gate", "distance_km": 2.8, "speed_limit": 60}
+          ]
+        }
+      ]
+    },
+    "bengaluru": {
+      "city_id": "bengaluru",
+      "city_name": "Bengaluru (Silicon City)",
+      "state": "Karnataka",
+      "authority": "Bruhat Bengaluru Mahanagara Palike (BBMP)",
+      "center": {"lat": 12.9352, "lng": 77.6245, "zoom": 13},
+      "zones": [
+        {
+          "id": "blr_silk_board",
+          "name": "Central Silk Board Junction",
+          "type": "intersection",
+          "lat": 12.9176,
+          "lng": 77.6234,
+          "camera_id": "CAM-BLR-01",
+          "signal_id": "SIG-BLR-01",
+          "base_capacity": 65,
+          "connections": [
+            {"to": "blr_koramangala", "distance_km": 2.4, "speed_limit": 45},
+            {"to": "blr_electronic_city", "distance_km": 8.5, "speed_limit": 70},
+            {"to": "blr_bellandur", "distance_km": 4.1, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "blr_koramangala",
+          "name": "Koramangala Sony World Signal",
+          "type": "commercial",
+          "lat": 12.9345,
+          "lng": 77.6265,
+          "camera_id": "CAM-BLR-02",
+          "signal_id": "SIG-BLR-02",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "blr_silk_board", "distance_km": 2.4, "speed_limit": 45},
+            {"to": "blr_indiranagar", "distance_km": 3.8, "speed_limit": 40},
+            {"to": "blr_mg_road", "distance_km": 4.5, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "blr_indiranagar",
+          "name": "Indiranagar 100 Feet Road",
+          "type": "commercial",
+          "lat": 12.9719,
+          "lng": 77.6412,
+          "camera_id": "CAM-BLR-03",
+          "signal_id": "SIG-BLR-03",
+          "base_capacity": 50,
+          "connections": [
+            {"to": "blr_koramangala", "distance_km": 3.8, "speed_limit": 40},
+            {"to": "blr_mg_road", "distance_km": 3.2, "speed_limit": 45},
+            {"to": "blr_marathahalli", "distance_km": 5.0, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "blr_mg_road",
+          "name": "MG Road Trinity Circle",
+          "type": "transit_hub",
+          "lat": 12.9738,
+          "lng": 77.6190,
+          "camera_id": "CAM-BLR-04",
+          "signal_id": "SIG-BLR-04",
+          "base_capacity": 60,
+          "connections": [
+            {"to": "blr_koramangala", "distance_km": 4.5, "speed_limit": 50},
+            {"to": "blr_indiranagar", "distance_km": 3.2, "speed_limit": 45},
+            {"to": "blr_majestic", "distance_km": 4.0, "speed_limit": 40}
+          ]
+        },
+        {
+          "id": "blr_bellandur",
+          "name": "Bellandur Outer Ring Road",
+          "type": "commercial",
+          "lat": 12.9260,
+          "lng": 77.6762,
+          "camera_id": "CAM-BLR-05",
+          "signal_id": "SIG-BLR-05",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "blr_silk_board", "distance_km": 4.1, "speed_limit": 50},
+            {"to": "blr_marathahalli", "distance_km": 3.5, "speed_limit": 55},
+            {"to": "blr_electronic_city", "distance_km": 9.2, "speed_limit": 70}
+          ]
+        },
+        {
+          "id": "blr_marathahalli",
+          "name": "Marathahalli Bridge Junction",
+          "type": "intersection",
+          "lat": 12.9562,
+          "lng": 77.7011,
+          "camera_id": "CAM-BLR-06",
+          "signal_id": "SIG-BLR-06",
+          "base_capacity": 65,
+          "connections": [
+            {"to": "blr_bellandur", "distance_km": 3.5, "speed_limit": 55},
+            {"to": "blr_whitefield", "distance_km": 5.2, "speed_limit": 50},
+            {"to": "blr_indiranagar", "distance_km": 5.0, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "blr_whitefield",
+          "name": "Whitefield ITPL Main Gate",
+          "type": "commercial",
+          "lat": 12.9856,
+          "lng": 77.7279,
+          "camera_id": "CAM-BLR-07",
+          "signal_id": "SIG-BLR-07",
+          "base_capacity": 60,
+          "parking_total_spots": 150,
+          "connections": [
+            {"to": "blr_marathahalli", "distance_km": 5.2, "speed_limit": 50},
+            {"to": "blr_hebbal", "distance_km": 14.0, "speed_limit": 70}
+          ]
+        },
+        {
+          "id": "blr_electronic_city",
+          "name": "Electronic City Elevated Toll",
+          "type": "expressway",
+          "lat": 12.8452,
+          "lng": 77.6602,
+          "camera_id": "CAM-BLR-08",
+          "base_capacity": 80,
+          "connections": [
+            {"to": "blr_silk_board", "distance_km": 8.5, "speed_limit": 70},
+            {"to": "blr_bellandur", "distance_km": 9.2, "speed_limit": 70}
+          ]
+        },
+        {
+          "id": "blr_hebbal",
+          "name": "Hebbal Flyover Junction",
+          "type": "intersection",
+          "lat": 13.0358,
+          "lng": 77.5970,
+          "camera_id": "CAM-BLR-09",
+          "signal_id": "SIG-BLR-09",
+          "base_capacity": 75,
+          "connections": [
+            {"to": "blr_majestic", "distance_km": 7.0, "speed_limit": 55},
+            {"to": "blr_whitefield", "distance_km": 14.0, "speed_limit": 70}
+          ]
+        },
+        {
+          "id": "blr_majestic",
+          "name": "Kempegowda Majestic Hub & Hospital",
+          "type": "hospital",
+          "lat": 12.9767,
+          "lng": 77.5713,
+          "camera_id": "CAM-BLR-10",
+          "signal_id": "SIG-BLR-10",
+          "base_capacity": 50,
+          "is_hospital": true,
+          "connections": [
+            {"to": "blr_mg_road", "distance_km": 4.0, "speed_limit": 40},
+            {"to": "blr_hebbal", "distance_km": 7.0, "speed_limit": 55}
+          ]
+        }
+      ]
+    },
+    "mumbai": {
+      "city_id": "mumbai",
+      "city_name": "Mumbai (Financial Capital)",
+      "state": "Maharashtra",
+      "authority": "Brihanmumbai Municipal Corporation (BMC)",
+      "center": {"lat": 19.0596, "lng": 72.8656, "zoom": 13},
+      "zones": [
+        {
+          "id": "mum_bkc",
+          "name": "Bandra-Kurla Complex (BKC)",
+          "type": "commercial",
+          "lat": 19.0664,
+          "lng": 72.8687,
+          "camera_id": "CAM-MUM-01",
+          "signal_id": "SIG-MUM-01",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "mum_bandra_station", "distance_km": 2.1, "speed_limit": 40},
+            {"to": "mum_sion", "distance_km": 3.0, "speed_limit": 50},
+            {"to": "mum_western_express", "distance_km": 2.5, "speed_limit": 60}
+          ]
+        },
+        {
+          "id": "mum_bandra_station",
+          "name": "Bandra West Linking Road",
+          "type": "commercial",
+          "lat": 19.0544,
+          "lng": 72.8402,
+          "camera_id": "CAM-MUM-02",
+          "signal_id": "SIG-MUM-02",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "mum_bkc", "distance_km": 2.1, "speed_limit": 40},
+            {"to": "mum_worli_seaface", "distance_km": 5.4, "speed_limit": 60},
+            {"to": "mum_andheri_link", "distance_km": 6.2, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "mum_worli_seaface",
+          "name": "Worli Sea Link Entrance",
+          "type": "expressway",
+          "lat": 19.0176,
+          "lng": 72.8152,
+          "camera_id": "CAM-MUM-03",
+          "signal_id": "SIG-MUM-03",
+          "base_capacity": 80,
+          "connections": [
+            {"to": "mum_bandra_station", "distance_km": 5.4, "speed_limit": 60},
+            {"to": "mum_lower_parel", "distance_km": 2.8, "speed_limit": 45},
+            {"to": "mum_marine_drive", "distance_km": 7.5, "speed_limit": 60}
+          ]
+        },
+        {
+          "id": "mum_lower_parel",
+          "name": "Lower Parel Commercial Hub",
+          "type": "commercial",
+          "lat": 18.9986,
+          "lng": 72.8311,
+          "camera_id": "CAM-MUM-04",
+          "signal_id": "SIG-MUM-04",
+          "base_capacity": 60,
+          "parking_total_spots": 180,
+          "connections": [
+            {"to": "mum_worli_seaface", "distance_km": 2.8, "speed_limit": 45},
+            {"to": "mum_dadar_tt", "distance_km": 2.2, "speed_limit": 40}
+          ]
+        },
+        {
+          "id": "mum_dadar_tt",
+          "name": "Dadar TT Circle & KEM Hospital",
+          "type": "hospital",
+          "lat": 19.0178,
+          "lng": 72.8478,
+          "camera_id": "CAM-MUM-05",
+          "signal_id": "SIG-MUM-05",
+          "base_capacity": 55,
+          "is_hospital": true,
+          "connections": [
+            {"to": "mum_lower_parel", "distance_km": 2.2, "speed_limit": 40},
+            {"to": "mum_sion", "distance_km": 3.1, "speed_limit": 45},
+            {"to": "mum_marine_drive", "distance_km": 8.0, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "mum_sion",
+          "name": "Sion Circle Flyover",
+          "type": "intersection",
+          "lat": 19.0434,
+          "lng": 72.8624,
+          "camera_id": "CAM-MUM-06",
+          "signal_id": "SIG-MUM-06",
+          "base_capacity": 65,
+          "connections": [
+            {"to": "mum_bkc", "distance_km": 3.0, "speed_limit": 50},
+            {"to": "mum_dadar_tt", "distance_km": 3.1, "speed_limit": 45},
+            {"to": "mum_powai", "distance_km": 7.0, "speed_limit": 55}
+          ]
+        },
+        {
+          "id": "mum_marine_drive",
+          "name": "Marine Drive Nariman Point",
+          "type": "commercial",
+          "lat": 18.9260,
+          "lng": 72.8230,
+          "camera_id": "CAM-MUM-07",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "mum_worli_seaface", "distance_km": 7.5, "speed_limit": 60},
+            {"to": "mum_dadar_tt", "distance_km": 8.0, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "mum_western_express",
+          "name": "Western Express Highway Andheri",
+          "type": "expressway",
+          "lat": 19.1136,
+          "lng": 72.8574,
+          "camera_id": "CAM-MUM-08",
+          "base_capacity": 85,
+          "connections": [
+            {"to": "mum_bkc", "distance_km": 2.5, "speed_limit": 60},
+            {"to": "mum_andheri_link", "distance_km": 2.8, "speed_limit": 45},
+            {"to": "mum_powai", "distance_km": 4.5, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "mum_andheri_link",
+          "name": "Andheri West Lokhandwala",
+          "type": "residential",
+          "lat": 19.1384,
+          "lng": 72.8286,
+          "camera_id": "CAM-MUM-09",
+          "signal_id": "SIG-MUM-09",
+          "base_capacity": 50,
+          "connections": [
+            {"to": "mum_bandra_station", "distance_km": 6.2, "speed_limit": 50},
+            {"to": "mum_western_express", "distance_km": 2.8, "speed_limit": 45}
+          ]
+        },
+        {
+          "id": "mum_powai",
+          "name": "Powai Hiranandani Tech Hub",
+          "type": "commercial",
+          "lat": 19.1197,
+          "lng": 72.9056,
+          "camera_id": "CAM-MUM-10",
+          "signal_id": "SIG-MUM-10",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "mum_sion", "distance_km": 7.0, "speed_limit": 55},
+            {"to": "mum_western_express", "distance_km": 4.5, "speed_limit": 50}
+          ]
+        }
+      ]
+    },
+    "delhi": {
+      "city_id": "delhi",
+      "city_name": "Delhi NCR (National Capital)",
+      "state": "Delhi",
+      "authority": "Municipal Corporation of Delhi (MCD)",
+      "center": {"lat": 28.6139, "lng": 77.2090, "zoom": 13},
+      "zones": [
+        {
+          "id": "del_connaught_place",
+          "name": "Connaught Place Inner Circle",
+          "type": "commercial",
+          "lat": 28.6315,
+          "lng": 77.2167,
+          "camera_id": "CAM-DEL-01",
+          "signal_id": "SIG-DEL-01",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "del_aiims_chowk", "distance_km": 5.8, "speed_limit": 50},
+            {"to": "del_dhaula_kuan", "distance_km": 6.5, "speed_limit": 60},
+            {"to": "del_karol_bagh", "distance_km": 3.4, "speed_limit": 45}
+          ]
+        },
+        {
+          "id": "del_aiims_chowk",
+          "name": "AIIMS Trauma Center & Ring Road",
+          "type": "hospital",
+          "lat": 28.5682,
+          "lng": 77.2100,
+          "camera_id": "CAM-DEL-02",
+          "signal_id": "SIG-DEL-02",
+          "base_capacity": 60,
+          "is_hospital": true,
+          "connections": [
+            {"to": "del_connaught_place", "distance_km": 5.8, "speed_limit": 50},
+            {"to": "del_south_ext", "distance_km": 1.5, "speed_limit": 40},
+            {"to": "del_dhaula_kuan", "distance_km": 5.2, "speed_limit": 60}
+          ]
+        },
+        {
+          "id": "del_south_ext",
+          "name": "South Extension Market Ring Road",
+          "type": "commercial",
+          "lat": 28.5728,
+          "lng": 77.2225,
+          "camera_id": "CAM-DEL-03",
+          "signal_id": "SIG-DEL-03",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "del_aiims_chowk", "distance_km": 1.5, "speed_limit": 40},
+            {"to": "del_nehru_place", "distance_km": 4.2, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "del_nehru_place",
+          "name": "Nehru Place Commercial Square",
+          "type": "commercial",
+          "lat": 28.5494,
+          "lng": 77.2528,
+          "camera_id": "CAM-DEL-04",
+          "signal_id": "SIG-DEL-04",
+          "base_capacity": 65,
+          "parking_total_spots": 140,
+          "connections": [
+            {"to": "del_south_ext", "distance_km": 4.2, "speed_limit": 50},
+            {"to": "del_noida_sec18", "distance_km": 8.0, "speed_limit": 65}
+          ]
+        },
+        {
+          "id": "del_dhaula_kuan",
+          "name": "Dhaula Kuan Arterial Interchange",
+          "type": "intersection",
+          "lat": 28.5913,
+          "lng": 77.1624,
+          "camera_id": "CAM-DEL-05",
+          "signal_id": "SIG-DEL-05",
+          "base_capacity": 80,
+          "connections": [
+            {"to": "del_connaught_place", "distance_km": 6.5, "speed_limit": 60},
+            {"to": "del_aiims_chowk", "distance_km": 5.2, "speed_limit": 60},
+            {"to": "del_cyber_city", "distance_km": 11.0, "speed_limit": 80}
+          ]
+        },
+        {
+          "id": "del_cyber_city",
+          "name": "DLF Cyber City Gurugram Expressway",
+          "type": "commercial",
+          "lat": 28.4950,
+          "lng": 77.0890,
+          "camera_id": "CAM-DEL-06",
+          "signal_id": "SIG-DEL-06",
+          "base_capacity": 85,
+          "connections": [
+            {"to": "del_dhaula_kuan", "distance_km": 11.0, "speed_limit": 80}
+          ]
+        },
+        {
+          "id": "del_noida_sec18",
+          "name": "Noida Sector 18 Mall Hub",
+          "type": "commercial",
+          "lat": 28.5708,
+          "lng": 77.3261,
+          "camera_id": "CAM-DEL-07",
+          "signal_id": "SIG-DEL-07",
+          "base_capacity": 60,
+          "connections": [
+            {"to": "del_nehru_place", "distance_km": 8.0, "speed_limit": 65}
+          ]
+        },
+        {
+          "id": "del_karol_bagh",
+          "name": "Karol Bagh Pusa Road",
+          "type": "residential",
+          "lat": 28.6517,
+          "lng": 77.1906,
+          "camera_id": "CAM-DEL-08",
+          "signal_id": "SIG-DEL-08",
+          "base_capacity": 50,
+          "connections": [
+            {"to": "del_connaught_place", "distance_km": 3.4, "speed_limit": 45}
+          ]
+        }
+      ]
+    },
+    "pune": {
+      "city_id": "pune",
+      "city_name": "Pune (Oxford of the East)",
+      "state": "Maharashtra",
+      "authority": "Pune Municipal Corporation (PMC)",
+      "center": {"lat": 18.5204, "lng": 73.8567, "zoom": 13},
+      "zones": [
+        {
+          "id": "pun_hinjawadi",
+          "name": "Hinjawadi Phase 1 IT Park",
+          "type": "commercial",
+          "lat": 18.5913,
+          "lng": 73.7389,
+          "camera_id": "CAM-PUN-01",
+          "signal_id": "SIG-PUN-01",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "pun_baner", "distance_km": 6.2, "speed_limit": 60},
+            {"to": "pun_kothrud", "distance_km": 11.0, "speed_limit": 65}
+          ]
+        },
+        {
+          "id": "pun_baner",
+          "name": "Baner High Street Junction",
+          "type": "commercial",
+          "lat": 18.5590,
+          "lng": 73.7868,
+          "camera_id": "CAM-PUN-02",
+          "signal_id": "SIG-PUN-02",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "pun_hinjawadi", "distance_km": 6.2, "speed_limit": 60},
+            {"to": "pun_shivajinagar", "distance_km": 5.8, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "pun_shivajinagar",
+          "name": "Shivajinagar Central Interchange",
+          "type": "transit_hub",
+          "lat": 18.5314,
+          "lng": 73.8446,
+          "camera_id": "CAM-PUN-03",
+          "signal_id": "SIG-PUN-03",
+          "base_capacity": 65,
+          "is_hospital": true,
+          "connections": [
+            {"to": "pun_baner", "distance_km": 5.8, "speed_limit": 50},
+            {"to": "pun_viman_nagar", "distance_km": 7.4, "speed_limit": 55},
+            {"to": "pun_kothrud", "distance_km": 4.5, "speed_limit": 45}
+          ]
+        },
+        {
+          "id": "pun_kothrud",
+          "name": "Kothrud Chandani Chowk",
+          "type": "intersection",
+          "lat": 18.5074,
+          "lng": 73.8077,
+          "camera_id": "CAM-PUN-04",
+          "signal_id": "SIG-PUN-04",
+          "base_capacity": 60,
+          "connections": [
+            {"to": "pun_shivajinagar", "distance_km": 4.5, "speed_limit": 45},
+            {"to": "pun_hinjawadi", "distance_km": 11.0, "speed_limit": 65}
+          ]
+        },
+        {
+          "id": "pun_viman_nagar",
+          "name": "Viman Nagar Phoenix Corridor",
+          "type": "commercial",
+          "lat": 18.5679,
+          "lng": 73.9143,
+          "camera_id": "CAM-PUN-05",
+          "signal_id": "SIG-PUN-05",
+          "base_capacity": 55,
+          "parking_total_spots": 130,
+          "connections": [
+            {"to": "pun_shivajinagar", "distance_km": 7.4, "speed_limit": 55}
+          ]
+        }
+      ]
+    },
+    "chennai": {
+      "city_id": "chennai",
+      "city_name": "Chennai (Automobile Capital)",
+      "state": "Tamil Nadu",
+      "authority": "Greater Chennai Corporation (GCC)",
+      "center": {"lat": 13.0012, "lng": 80.2565, "zoom": 13},
+      "zones": [
+        {
+          "id": "chn_omr_tidal",
+          "name": "OMR Tidel Park IT Expressway",
+          "type": "commercial",
+          "lat": 12.9893,
+          "lng": 80.2486,
+          "camera_id": "CAM-CHN-01",
+          "signal_id": "SIG-CHN-01",
+          "base_capacity": 70,
+          "connections": [
+            {"to": "chn_guindy", "distance_km": 4.8, "speed_limit": 55},
+            {"to": "chn_velachery", "distance_km": 3.6, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "chn_guindy",
+          "name": "Guindy Kathipara Grade Separator",
+          "type": "intersection",
+          "lat": 13.0067,
+          "lng": 80.2038,
+          "camera_id": "CAM-CHN-02",
+          "signal_id": "SIG-CHN-02",
+          "base_capacity": 80,
+          "connections": [
+            {"to": "chn_omr_tidal", "distance_km": 4.8, "speed_limit": 55},
+            {"to": "chn_t_nagar", "distance_km": 5.2, "speed_limit": 45},
+            {"to": "chn_velachery", "distance_km": 4.1, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "chn_t_nagar",
+          "name": "T. Nagar Panagal Park Shopping Hub",
+          "type": "commercial",
+          "lat": 13.0418,
+          "lng": 80.2341,
+          "camera_id": "CAM-CHN-03",
+          "signal_id": "SIG-CHN-03",
+          "base_capacity": 65,
+          "connections": [
+            {"to": "chn_guindy", "distance_km": 5.2, "speed_limit": 45},
+            {"to": "chn_anna_nagar", "distance_km": 6.0, "speed_limit": 50},
+            {"to": "chn_marina", "distance_km": 5.5, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "chn_velachery",
+          "name": "Velachery Bypass & Phoenix Mall",
+          "type": "commercial",
+          "lat": 12.9785,
+          "lng": 80.2185,
+          "camera_id": "CAM-CHN-04",
+          "signal_id": "SIG-CHN-04",
+          "base_capacity": 55,
+          "connections": [
+            {"to": "chn_omr_tidal", "distance_km": 3.6, "speed_limit": 50},
+            {"to": "chn_guindy", "distance_km": 4.1, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "chn_anna_nagar",
+          "name": "Anna Nagar Roundtana",
+          "type": "residential",
+          "lat": 13.0850,
+          "lng": 80.2101,
+          "camera_id": "CAM-CHN-05",
+          "signal_id": "SIG-CHN-05",
+          "base_capacity": 55,
+          "is_hospital": true,
+          "connections": [
+            {"to": "chn_t_nagar", "distance_km": 6.0, "speed_limit": 50}
+          ]
+        },
+        {
+          "id": "chn_marina",
+          "name": "Marina Beach Kamarajar Salai",
+          "type": "commercial",
+          "lat": 13.0500,
+          "lng": 80.2824,
+          "camera_id": "CAM-CHN-06",
+          "base_capacity": 65,
+          "connections": [
+            {"to": "chn_t_nagar", "distance_km": 5.5, "speed_limit": 50}
+          ]
+        }
+      ]
+    }
+  }
+}

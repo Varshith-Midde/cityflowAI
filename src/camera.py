@@ -124,6 +124,16 @@ class VideoStream:
             return self.set_frame_index(0)
         return False
 
+    def start(self) -> bool:
+        """Starts or verifies the stream is active."""
+        if not self.is_opened or self.cap is None or not self.cap.isOpened():
+            self._initialize_stream()
+        return self.is_opened
+
+    def stop(self) -> None:
+        """Stops and releases the video stream resources."""
+        self.release()
+
     def release(self) -> None:
         """Releases the video stream resources."""
         if self.cap is not None:
@@ -137,3 +147,7 @@ class VideoStream:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.release()
+
+
+# Alias for backwards compatibility with edge client scripts
+CameraStream = VideoStream

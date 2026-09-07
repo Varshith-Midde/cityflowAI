@@ -66,6 +66,16 @@ class VehicleDetectionConfig:
     show_density: bool = True
     color_by_track_id: bool = True
 
+    # Centralized Smart City Platform Configuration
+    server_host: str = "127.0.0.1"
+    server_port: int = 8000
+    city_config_path: str = "city_zones.json"
+    zone_update_interval_sec: float = 2.0
+    city_name: str = "Metro CityFlow"
+    city_center_lat: float = 17.4435  # Hi-Tech City / Cyberabad coordinates
+    city_center_lng: float = 78.3772
+    default_zoom: int = 14
+
     # Snapshot and Recording output directory
     output_dir: str = "outputs"
     snapshots_dir: str = "outputs/snapshots"

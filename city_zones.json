@@ -1,0 +1,183 @@
+{
+  "city_name": "CityFlow Smart Metro",
+  "center": {
+    "lat": 17.4435,
+    "lng": 78.3772,
+    "zoom": 14
+  },
+  "zones": [
+    {
+      "id": "zone_hitech_junction",
+      "name": "Hi-Tech City Junction",
+      "type": "intersection",
+      "lat": 17.4485,
+      "lng": 78.3740,
+      "camera_id": "CAM-01",
+      "signal_id": "SIG-01",
+      "base_capacity": 50,
+      "connections": [
+        {"to": "zone_cyber_towers", "distance_km": 1.2, "speed_limit": 50},
+        {"to": "zone_expressway_north", "distance_km": 2.1, "speed_limit": 80},
+        {"to": "zone_it_corridor", "distance_km": 1.5, "speed_limit": 50}
+      ]
+    },
+    {
+      "id": "zone_cyber_towers",
+      "name": "Cyber Towers Circle",
+      "type": "commercial",
+      "lat": 17.4504,
+      "lng": 78.3809,
+      "camera_id": "CAM-02",
+      "signal_id": "SIG-02",
+      "base_capacity": 65,
+      "connections": [
+        {"to": "zone_hitech_junction", "distance_km": 1.2, "speed_limit": 50},
+        {"to": "zone_metro_station", "distance_km": 0.9, "speed_limit": 40},
+        {"to": "zone_market_square", "distance_km": 1.6, "speed_limit": 45}
+      ]
+    },
+    {
+      "id": "zone_metro_station",
+      "name": "Metro Transit Interchange",
+      "type": "transit_hub",
+      "lat": 17.4470,
+      "lng": 78.3860,
+      "camera_id": "CAM-03",
+      "signal_id": "SIG-03",
+      "base_capacity": 40,
+      "bus_lines": ["Line-101", "Line-204", "Express-Airport"],
+      "connections": [
+        {"to": "zone_cyber_towers", "distance_km": 0.9, "speed_limit": 40},
+        {"to": "zone_tech_park_parking", "distance_km": 0.7, "speed_limit": 30},
+        {"to": "zone_central_hospital", "distance_km": 1.8, "speed_limit": 50}
+      ]
+    },
+    {
+      "id": "zone_central_hospital",
+      "name": "Metro General Hospital & Trauma Center",
+      "type": "hospital",
+      "lat": 17.4410,
+      "lng": 78.3910,
+      "camera_id": "CAM-04",
+      "ambulance_depot": true,
+      "emergency_priority": 10,
+      "connections": [
+        {"to": "zone_metro_station", "distance_km": 1.8, "speed_limit": 50},
+        {"to": "zone_emergency_hq", "distance_km": 1.4, "speed_limit": 50},
+        {"to": "zone_lake_road", "distance_km": 1.7, "speed_limit": 40}
+      ]
+    },
+    {
+      "id": "zone_it_corridor",
+      "name": "Silicon IT Corridor",
+      "type": "commercial",
+      "lat": 17.4420,
+      "lng": 78.3710,
+      "camera_id": "CAM-05",
+      "signal_id": "SIG-04",
+      "base_capacity": 60,
+      "connections": [
+        {"to": "zone_hitech_junction", "distance_km": 1.5, "speed_limit": 50},
+        {"to": "zone_residential_avenue", "distance_km": 1.3, "speed_limit": 40},
+        {"to": "zone_lake_road", "distance_km": 1.9, "speed_limit": 45}
+      ]
+    },
+    {
+      "id": "zone_expressway_north",
+      "name": "North Ring Expressway",
+      "type": "expressway",
+      "lat": 17.4580,
+      "lng": 78.3720,
+      "camera_id": "CAM-06",
+      "base_capacity": 90,
+      "connections": [
+        {"to": "zone_hitech_junction", "distance_km": 2.1, "speed_limit": 80},
+        {"to": "zone_logistics_park", "distance_km": 2.8, "speed_limit": 80}
+      ]
+    },
+    {
+      "id": "zone_logistics_park",
+      "name": "City Logistics Distribution Hub",
+      "type": "logistics",
+      "lat": 17.4640,
+      "lng": 78.3850,
+      "camera_id": "CAM-07",
+      "warehouse_hub": true,
+      "fleet_vehicles": ["TRUCK-A1", "VAN-B2", "VAN-B3", "EV-CARGO-C1"],
+      "connections": [
+        {"to": "zone_expressway_north", "distance_km": 2.8, "speed_limit": 80},
+        {"to": "zone_market_square", "distance_km": 2.2, "speed_limit": 50}
+      ]
+    },
+    {
+      "id": "zone_market_square",
+      "name": "Central Retail & Market Square",
+      "type": "commercial",
+      "lat": 17.4520,
+      "lng": 78.3900,
+      "camera_id": "CAM-08",
+      "signal_id": "SIG-05",
+      "waste_bins": ["BIN-101", "BIN-102", "BIN-103"],
+      "connections": [
+        {"to": "zone_cyber_towers", "distance_km": 1.6, "speed_limit": 45},
+        {"to": "zone_logistics_park", "distance_km": 2.2, "speed_limit": 50},
+        {"to": "zone_tech_park_parking", "distance_km": 1.1, "speed_limit": 40}
+      ]
+    },
+    {
+      "id": "zone_tech_park_parking",
+      "name": "Tech Gateway Multi-Level Parking",
+      "type": "parking",
+      "lat": 17.4490,
+      "lng": 78.3880,
+      "camera_id": "CAM-09",
+      "parking_total_spots": 120,
+      "connections": [
+        {"to": "zone_metro_station", "distance_km": 0.7, "speed_limit": 30},
+        {"to": "zone_market_square", "distance_km": 1.1, "speed_limit": 40}
+      ]
+    },
+    {
+      "id": "zone_lake_road",
+      "name": "Durgam Lakeview Causeway",
+      "type": "flood_risk",
+      "lat": 17.4360,
+      "lng": 78.3830,
+      "camera_id": "CAM-10",
+      "flood_sensor_id": "WATER-SENS-01",
+      "drainage_rating": 0.45,
+      "connections": [
+        {"to": "zone_it_corridor", "distance_km": 1.9, "speed_limit": 45},
+        {"to": "zone_central_hospital", "distance_km": 1.7, "speed_limit": 40},
+        {"to": "zone_residential_avenue", "distance_km": 1.4, "speed_limit": 35}
+      ]
+    },
+    {
+      "id": "zone_residential_avenue",
+      "name": "Hilltop Residential Enclave",
+      "type": "residential",
+      "lat": 17.4370,
+      "lng": 78.3730,
+      "camera_id": "CAM-11",
+      "waste_bins": ["BIN-201", "BIN-202"],
+      "connections": [
+        {"to": "zone_it_corridor", "distance_km": 1.3, "speed_limit": 40},
+        {"to": "zone_lake_road", "distance_km": 1.4, "speed_limit": 35},
+        {"to": "zone_emergency_hq", "distance_km": 2.0, "speed_limit": 45}
+      ]
+    },
+    {
+      "id": "zone_emergency_hq",
+      "name": "Integrated City Operations & Disaster HQ",
+      "type": "command",
+      "lat": 17.4350,
+      "lng": 78.3930,
+      "camera_id": "CAM-12",
+      "emergency_control_room": true,
+      "connections": [
+        {"to": "zone_central_hospital", "distance_km": 1.4, "speed_limit": 50},
+        {"to": "zone_residential_avenue", "distance_km": 2.0, "speed_limit": 45}
+      ]
+    }
+  ]
+}

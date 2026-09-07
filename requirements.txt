@@ -5,3 +5,9 @@ numpy>=1.24.0
 torch>=2.0.0
 torchvision>=0.15.0
 pillow>=10.0.0
+
+# Centralized Traffic Intelligence & Smart City Backend
+fastapi>=0.110.0
+uvicorn>=0.28.0
+websockets>=12.0
+httpx>=0.27.0
