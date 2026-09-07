@@ -236,15 +236,57 @@ function populateZoneDropdowns(zones) {
 
   selects.forEach(s => { if (s) s.innerHTML = ''; });
 
+  // Group zones by district label for cleaner UX with 76 zones
+  const groups = {};
   zones.forEach(z => {
-    const opt = document.createElement('option');
-    opt.value = z.id;
-    opt.textContent = `${z.name} (${z.density_label})`;
-
-    selects.forEach(s => {
-      if (s) s.appendChild(opt.cloneNode(true));
-    });
+    const district = z.district || 'General';
+    if (!groups[district]) groups[district] = [];
+    groups[district].push(z);
   });
+
+  const districtOrder = [
+    'GHMC — Serilingampally Zone',
+    'GHMC — Khairatabad Zone',
+    'GHMC — Secunderabad Zone',
+    'GHMC — Kukatpally Zone',
+    'GHMC — LB Nagar Zone',
+    'GHMC — Charminar Zone',
+    'Ranga Reddy District',
+    'General'
+  ];
+
+  const buildOptions = (select) => {
+    districtOrder.forEach(districtKey => {
+      const areaZones = groups[districtKey];
+      if (!areaZones || areaZones.length === 0) return;
+      const grp = document.createElement('optgroup');
+      grp.label = districtKey;
+      areaZones.forEach(z => {
+        const opt = document.createElement('option');
+        opt.value = z.id;
+        opt.textContent = z.name;
+        grp.appendChild(opt);
+      });
+      select.appendChild(grp);
+    });
+    // Any remaining districts not in order list
+    Object.keys(groups).forEach(key => {
+      if (!districtOrder.includes(key)) {
+        const areaZones = groups[key];
+        const grp = document.createElement('optgroup');
+        grp.label = key;
+        areaZones.forEach(z => {
+          const opt = document.createElement('option');
+          opt.value = z.id;
+          opt.textContent = z.name;
+          grp.appendChild(opt);
+        });
+        select.appendChild(grp);
+      }
+    });
+  };
+
+  selects.forEach(s => { if (s) buildOptions(s); });
 
   const smartFrom = document.getElementById('smartFromZone');
   const smartTo = document.getElementById('smartToZone');
